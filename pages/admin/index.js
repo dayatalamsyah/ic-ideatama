@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { isLoggedIn, logoutAdmin } from "../../lib/auth";
 import supabase from "../../lib/supabaseClient";
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchOrders();
+    if (!isLoggedIn()) {
+      router.push('/admin/login');
+    } else {
+      fetchOrders();
+    }
   }, []);
 
   const fetchOrders = async () => {
@@ -19,9 +26,20 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const handleLogout = () => {
+    logoutAdmin();
+    router.push('/admin/login');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Dashboard Admin - Order Masuk</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Dashboard Admin - Order Masuk</h1>
+        <button onClick={handleLogout} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+          Logout
+        </button>
+      </div>
+
       {loading ? (
         <p className="text-center">Loading data...</p>
       ) : (
