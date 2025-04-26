@@ -1,6 +1,8 @@
 import { Resend } from "resend";
+import { createClient } from '@supabase/supabase-js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -10,38 +12,37 @@ export default async function handler(req, res) {
   const { name, whatsapp, email, address, service, message } = req.body;
 
   try {
-    const data = await resend.sendEmail({
-      from: "PT IC-IDEATAMA <onboarding@resend.dev>",
+    // 1. Kirim Email Order
+    await resend.sendEmail({
+      from: "PT IC-IDEATAMA <onboarding@resend.dev>", // Ganti nanti ke noreply@ kalau domain verified
       to: ["dayatalamsyah@gmail.com"],
       subject: `Order Baru dari ${name}`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width:600px; margin:auto; border:1px solid #eee; border-radius:8px; overflow:hidden;">
-    <div style="background-color:#F97316; padding:20px; text-align:center;">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6d/Windows_Settings_app_icon.png" alt="Logo IC-IDEATAMA" style="max-width:150px; margin-bottom:10px;" />
-      <h1 style="color:white; font-size:24px;">PT. IC-IDEATAMA</h1>
-      <p style="color:white; margin-top:5px;">Order Baru Masuk 🚀</p>
-    </div>
-
-    <div style="padding:20px; background-color:#ffffff;">
-      <h2 style="color:#333; font-size:20px; margin-bottom:15px;">Detail Order</h2>
-      <p><strong>Nama:</strong> ${name}</p>
-      <p><strong>WhatsApp:</strong> ${whatsapp}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Alamat:</strong> ${address}</p>
-      <p><strong>Layanan:</strong> ${service}</p>
-      <p><strong>Pesan Tambahan:</strong> ${message}</p>
-    </div>
-
-    <div style="background-color:#F3F4F6; padding:10px; text-align:center; font-size:12px; color:#888;">
-      © 2025 PT. IC-IDEATAMA. All rights reserved.
-    </div>
-  </div>
+        <div style="font-family: Arial, sans-serif;">
+          <h2>Order Baru Masuk 🚀</h2>
+          <p><strong>Nama:</strong> ${name}</p>
+          <p><strong>WhatsApp:</strong> ${whatsapp}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Alamat:</strong> ${address}</p>
+          <p><strong>Layanan:</strong> ${service}</p>
+          <p><strong>Pesan Tambahan:</strong> ${message}</p>
+        </div>
       `
     });
 
-    return res.status(200).json({ success: true, message: "Order berhasil dikirim ke email!" });
+    // 2. Save ke Database Supabase
+    const { data, error } = await supabase.from('orders').insert([
+      { name, whatsapp, email, address, service, message }
+    ]);
+
+    if (error) {
+      console.error("Supabase Error:", error);
+      throw error;
+    }
+
+    return res.status(200).json({ success: true, message: "Order berhasil dikirim ke email dan database!" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Gagal mengirim email.", details: error.message });
+    console.error("Error Submit Order:", error);
+    return res.status(500).json({ error: "Gagal memproses order.", details: error.message });
   }
 }
