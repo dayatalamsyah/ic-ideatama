@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export default function KelolaGaleri() {
   const [gallery, setGallery] = useState([
-    { id: 1, title: "Proyek AC Kementerian", image: "https://kemenaglampungtimur.id/public/berita/13-10-21-09-26-20-.jpeg" },
+    { id: 1, title: "Proyek AC Kementerian", image: "https://via.placeholder.com/300" },
     { id: 2, title: "Proyek AC BMKG", image: "https://via.placeholder.com/300" },
   ]);
 
