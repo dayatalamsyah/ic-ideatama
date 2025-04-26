@@ -3,19 +3,26 @@ import { useState, useEffect } from "react";
 
 export default function Home() {
   const [services, setServices] = useState([]);
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    // Simulasi fetch data layanan dari "admin"
     const dummyServices = [
       { id: 1, title: "Instalasi AC", description: "Layanan instalasi AC profesional." },
       { id: 2, title: "Perawatan Rutin", description: "Perawatan AC rutin untuk performa maksimal." },
     ];
     setServices(dummyServices);
+
+    const dummyProjects = [
+      { id: 1, title: "Proyek AC Kementerian", image: "https://via.placeholder.com/300" },
+      { id: 2, title: "Proyek AC BMKG", image: "https://via.placeholder.com/300" },
+    ];
+    setProjects(dummyProjects);
   }, []);
 
   return (
     <main className="min-h-screen bg-white text-gray-800 font-sans">
-      {/* Hero Section */}
+
+      {/* Hero */}
       <section className="bg-orange-600 text-white py-16 px-6 text-center">
         <h1 className="text-4xl font-bold mb-4">PT. IC-IDEATAMA</h1>
         <p className="text-lg mb-6">Kesejukan Tanpa Batas, Layanan Tanpa Kompromi</p>
@@ -46,35 +53,34 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Galeri Proyek */}
+      <section className="bg-white py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold mb-8 text-center">Galeri Proyek Terbaru</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project) => (
+              <div key={project.id} className="bg-gray-100 rounded-xl overflow-hidden shadow hover:shadow-lg transition">
+                <img src={project.image} alt={project.title} className="w-full h-48 object-cover" />
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold">{project.title}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Form Order */}
       <section className="py-16 px-6 text-center">
         <h2 className="text-3xl font-bold mb-4">Form Order</h2>
-        {/* Form Order tetap sama */}
+        {/* (Form Order tetap di sini) */}
       </section>
 
+      {/* Footer */}
       <footer className="bg-gray-800 text-white text-center py-4">
         <p className="text-sm">© 2025 PT. IC-IDEATAMA. All rights reserved.</p>
       </footer>
+
     </main>
   );
 }
-{/* Galeri Proyek */}
-<section className="bg-white py-16 px-6">
-  <div className="max-w-6xl mx-auto">
-    <h2 className="text-3xl font-bold mb-8 text-center">Galeri Proyek Terbaru</h2>
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[
-        { id: 1, title: "Proyek AC Kementerian", image: "https://via.placeholder.com/300" },
-        { id: 2, title: "Proyek AC BMKG", image: "https://via.placeholder.com/300" },
-      ].map((project) => (
-        <div key={project.id} className="bg-gray-100 rounded-xl overflow-hidden shadow hover:shadow-lg transition">
-          <img src={project.image} alt={project.title} className="w-full h-48 object-cover" />
-          <div className="p-4">
-            <h3 className="text-lg font-semibold">{project.title}</h3>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
-
