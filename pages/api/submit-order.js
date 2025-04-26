@@ -1,10 +1,34 @@
-export default function handler(req, res) {
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { name, whatsapp, email, address, service, message } = req.body;
-    console.log('Order Baru:', { name, whatsapp, email, address, service, message });
 
-    // Simulasi berhasil disubmit (next bisa dikembangkan save ke database)
-    return res.status(200).json({ success: true, message: "Order berhasil diterima!" });
+    try {
+      const data = await resend.emails.send({
+        from: "IC-IDEATAMA <noreply@ic-ideatama.com>",
+        to: ["dayatalamsyah@gmail.com"], // Email tujuan order baru
+        subject: `Order Baru dari ${name}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 10px;">
+            <h2>Order Baru Masuk 🚀</h2>
+            <p><strong>Nama:</strong> ${name}</p>
+            <p><strong>WhatsApp:</strong> ${whatsapp}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Alamat:</strong> ${address}</p>
+            <p><strong>Layanan:</strong> ${service}</p>
+            <p><strong>Pesan Tambahan:</strong> ${message}</p>
+          </div>
+        `,
+      });
+
+      return res.status(200).json({ success: true, message: "Order berhasil dikirim ke email!" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Gagal mengirim email.", details: error.message });
+    }
   } else {
     return res.status(405).json({ message: "Method not allowed" });
   }
