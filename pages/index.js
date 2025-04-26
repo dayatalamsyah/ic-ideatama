@@ -1,4 +1,5 @@
 import WhatsAppButton from "../components/WhatsAppButton";
+import GallerySection from "../components/GallerySection";
 import { useState, useEffect } from "react";
 
 export default function Home() {
@@ -22,7 +23,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white text-gray-800 font-sans">
 
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="bg-orange-600 text-white py-16 px-6 text-center">
         <h1 className="text-4xl font-bold mb-4">PT. IC-IDEATAMA</h1>
         <p className="text-lg mb-6">Kesejukan Tanpa Batas, Layanan Tanpa Kompromi</p>
@@ -54,26 +55,27 @@ export default function Home() {
       </section>
 
       {/* Galeri Proyek */}
-      <section className="bg-white py-16 px-6">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-center">Galeri Proyek Terbaru</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
-              <div key={project.id} className="bg-gray-100 rounded-xl overflow-hidden shadow hover:shadow-lg transition">
-                <img src={project.image} alt={project.title} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold">{project.title}</h3>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <GallerySection projects={projects} />
 
       {/* Form Order */}
       <section className="py-16 px-6 text-center">
         <h2 className="text-3xl font-bold mb-4">Form Order</h2>
-        {/* (Form Order tetap di sini) */}
+        <form method="POST" action="/api/submit-order" className="max-w-xl mx-auto space-y-4">
+          <input type="text" name="name" placeholder="Nama Lengkap" className="w-full p-3 border rounded" required />
+          <input type="text" name="whatsapp" placeholder="Nomor WhatsApp" className="w-full p-3 border rounded" required />
+          <input type="email" name="email" placeholder="Email" className="w-full p-3 border rounded" required />
+          <input type="text" name="address" placeholder="Alamat" className="w-full p-3 border rounded" required />
+          <select name="service" className="w-full p-3 border rounded" required>
+            <option value="">Pilih Layanan</option>
+            <option value="Instalasi AC">Instalasi AC</option>
+            <option value="Perawatan AC">Perawatan AC</option>
+            <option value="Perbaikan AC">Perbaikan AC</option>
+          </select>
+          <textarea name="message" placeholder="Pesan tambahan" className="w-full p-3 border rounded"></textarea>
+          <button type="submit" className="w-full bg-orange-600 text-white py-3 rounded hover:bg-orange-700">
+            Kirim Order
+          </button>
+        </form>
       </section>
 
       {/* Footer */}
