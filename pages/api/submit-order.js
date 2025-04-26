@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   try {
     const data = await resend.sendEmail({
-      from: "noreply@ic-ideatama.com",
+      from: "PT IC-IDEATAMA <onboarding@resend.dev>",
       to: ["dayatalamsyah@gmail.com"],
       subject: `Order Baru dari ${name}`,
       html: `
