@@ -6,12 +6,13 @@ export default function AdminLogin() {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (username === 'admin' && password === 'ideatama123') {
-      loginAdmin();
+      loginAdmin(remember);
       router.push('/admin');
     } else {
       setError('Username atau Password salah');
@@ -34,11 +35,24 @@ export default function AdminLogin() {
         <input
           type="password"
           placeholder="Password"
-          className="w-full p-3 border mb-6 rounded"
+          className="w-full p-3 border mb-4 rounded"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
+        {/* Checkbox Remember Me */}
+        <div className="flex items-center mb-6">
+          <input
+            type="checkbox"
+            id="remember"
+            className="mr-2"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+          />
+          <label htmlFor="remember" className="text-sm">Remember Me</label>
+        </div>
+
         <button type="submit" className="w-full bg-orange-600 text-white p-3 rounded hover:bg-orange-700">
           Login
         </button>
