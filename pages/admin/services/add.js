@@ -1,6 +1,4 @@
-'use client';
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import supabase from "../../../lib/supabaseClient";
 import { isLoggedIn } from "../../../lib/auth";
@@ -9,6 +7,13 @@ export default function AddServicePage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+
+  // ⛔ Jangan router.push() langsung! Harus lewat useEffect
+  useEffect(() => {
+    if (!isLoggedIn()) {
+      router.push('/admin/login');
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,11 +26,6 @@ export default function AddServicePage() {
       }
     }
   };
-
-  if (!isLoggedIn()) {
-    router.push('/admin/login');
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
