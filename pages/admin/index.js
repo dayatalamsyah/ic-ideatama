@@ -6,15 +6,39 @@ import { isLoggedIn } from "../../lib/auth";
 export default function AdminDashboard() {
   const router = useRouter();
   const [orders, setOrders] = useState([]);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalServices, setTotalServices] = useState(0);
+  const [totalProjects, setTotalProjects] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isLoggedIn()) {
       router.push('/admin/login');
     } else {
+      fetchDashboard();
       fetchOrders();
     }
   }, []);
+
+  const fetchDashboard = async () => {
+    // Fetch total orders
+    const { count: ordersCount } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true });
+    setTotalOrders(ordersCount || 0);
+
+    // Fetch total services
+    const { count: servicesCount } = await supabase
+      .from('services')
+      .select('*', { count: 'exact', head: true });
+    setTotalServices(servicesCount || 0);
+
+    // Fetch total projects
+    const { count: projectsCount } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true });
+    setTotalProjects(projectsCount || 0);
+  };
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -35,10 +59,8 @@ export default function AdminDashboard() {
     if (confirm('Yakin mau hapus order ini?')) {
       const { error } = await supabase.from('orders').delete().eq('id', id);
       if (!error) {
-        console.log('Order berhasil dihapus.');
-        setTimeout(() => {
-          fetchOrders();
-        }, 500);
+        fetchDashboard();
+        fetchOrders();
       } else {
         console.error('Gagal menghapus order:', error);
         alert('Gagal menghapus order');
@@ -50,6 +72,23 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold mb-8">Dashboard Admin - Order Masuk</h1>
 
+      {/* Statistik Dashboard */}
+      <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="bg-white shadow rounded-lg p-6 text-center">
+          <h2 className="text-2xl font-bold text-orange-600">{totalOrders}</h2>
+          <p className="text-gray-600 mt-2">Total Order</p>
+        </div>
+        <div className="bg-white shadow rounded-lg p-6 text-center">
+          <h2 className="text-2xl font-bold text-orange-600">{totalServices}</h2>
+          <p className="text-gray-600 mt-2">Total Layanan</p>
+        </div>
+        <div className="bg-white shadow rounded-lg p-6 text-center">
+          <h2 className="text-2xl font-bold text-orange-600">{totalProjects}</h2>
+          <p className="text-gray-600 mt-2">Total Proyek</p>
+        </div>
+      </div>
+
+      {/* List Order Masuk */}
       <div className="bg-white shadow rounded-lg p-6 overflow-x-auto">
         {loading ? (
           <p className="text-center text-gray-500">Loading data order...</p>
@@ -79,7 +118,7 @@ export default function AdminDashboard() {
                       <td className="px-4 py-2">{order.service}</td>
                       <td className="px-4 py-2">{order.message}</td>
                       <td className="px-4 py-2">{new Date(order.created_at).toLocaleDateString()}</td>
-                      <td className="px-4 py-2 space-x-2">
+                      <td className="px-4 py-2">
                         <button
                           onClick={() => handleDelete(order.id)}
                           className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
