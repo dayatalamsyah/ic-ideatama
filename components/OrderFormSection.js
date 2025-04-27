@@ -23,10 +23,43 @@ export default function OrderFormSection() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+
+    const payload = {
+      name: formData.get('name'),
+      whatsapp: formData.get('whatsapp'),
+      email: formData.get('email'),
+      address: formData.get('address'),
+      service: formData.get('service'),
+      message: formData.get('message')
+    };
+
+    try {
+      const response = await fetch('/api/submit-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        alert('Order berhasil dikirim!');
+        e.target.reset();
+      } else {
+        alert('Gagal mengirim order, silakan coba lagi.');
+      }
+    } catch (error) {
+      console.error('Error submit form:', error);
+      alert('Terjadi kesalahan saat mengirim order.');
+    }
+  };
+
   return (
     <section className="py-16 px-6 text-center">
       <h2 className="text-3xl font-bold mb-4">Form Order</h2>
-      <form method="POST" action="/api/submit-order" className="max-w-xl mx-auto space-y-4">
+      <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-4">
         <input
           type="text"
           name="name"
@@ -55,7 +88,6 @@ export default function OrderFormSection() {
           className="w-full p-3 border rounded"
           required
         />
-
         <select
           name="service"
           className="w-full p-3 border rounded"
@@ -68,13 +100,11 @@ export default function OrderFormSection() {
             </option>
           ))}
         </select>
-
         <textarea
           name="message"
           placeholder="Pesan tambahan"
           className="w-full p-3 border rounded"
         ></textarea>
-
         <button
           type="submit"
           className="w-full bg-orange-600 text-white py-3 rounded hover:bg-orange-700"
