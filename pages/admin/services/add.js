@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import supabase from "../../../lib/supabaseClient";
 import { isLoggedIn } from "../../../lib/auth";
@@ -8,22 +8,17 @@ export default function AddServicePage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
-  // ⛔ Jangan router.push() langsung! Harus lewat useEffect
-  useEffect(() => {
-    if (!isLoggedIn()) {
-      router.push('/admin/login');
-    }
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (title && description) {
-      const { error } = await supabase.from('services').insert([{ title, description }]);
+      const { error } = await supabase
+        .from('services')
+        .insert([{ title, description }]);
+        
       if (!error) {
-  setTimeout(() => {
-    router.push('/admin/services');
-  }, 500); // Kasih delay 500ms sebelum redirect
-}
+        setTimeout(() => {
+          router.push('/admin/services');
+        }, 500); // kasih waktu Supabase commit
       } else {
         alert('Gagal menambah layanan');
       }
