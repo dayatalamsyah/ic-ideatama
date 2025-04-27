@@ -6,6 +6,10 @@ import supabase from "../../lib/supabaseClient";
 import { isLoggedIn } from "../../lib/auth";
 import * as XLSX from "xlsx";
 import OrderChart from "../../components/OrderChart";
+import PieChartStatus from "../../components/PieChartStatus";
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -116,6 +120,17 @@ export default function AdminDashboard() {
   };
 
   const handleChangeStatus = async (orderId, newStatus) => {
+    const { data: orderData, error: fetchError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .single();
+
+    if (fetchError) {
+      console.error('Gagal fetch data order:', fetchError);
+      return;
+    }
+
     const { error } = await supabase
       .from('orders')
       .update({ status: newStatus })
@@ -123,8 +138,32 @@ export default function AdminDashboard() {
 
     if (!error) {
       fetchOrders();
+      sendStatusEmail(orderData, newStatus);
     } else {
       alert('Gagal mengubah status');
+    }
+  };
+
+  const sendStatusEmail = async (orderData, newStatus) => {
+    try {
+      await resend.emails.send({
+        from: 'IC-IDEATAMA <onboarding@resend.dev>',
+        to: orderData.email,
+        subject: `Status Order Anda Telah Diperbarui`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px;">
+            <h2>Halo ${orderData.name},</h2>
+            <p>Order Anda kini berstatus: <strong>${newStatus}</strong>.</p>
+            <p>Terima kasih telah mempercayakan layanan kepada <strong>PT. IC-IDEATAMA</strong>.</p>
+            <br/>
+            <p>Salam hangat,</p>
+            <p><strong>PT. IC-IDEATAMA</strong></p>
+          </div>
+        `
+      });
+      console.log('Email notifikasi status berhasil dikirim.');
+    } catch (err) {
+      console.error('Gagal mengirim email status:', err);
     }
   };
 
@@ -155,23 +194,10 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Statistik per Status */}
-      <div className="grid md:grid-cols-3 gap-6 mb-12">
-        <div className="bg-white shadow rounded-lg p-6 text-center">
-          <h2 className="text-2xl font-bold text-blue-600">{statusCounts.Baru}</h2>
-          <p className="text-gray-600 mt-2">Order Baru</p>
-        </div>
-        <div className="bg-white shadow rounded-lg p-6 text-center">
-          <h2 className="text-2xl font-bold text-yellow-600">{statusCounts.Diproses}</h2>
-          <p className="text-gray-600 mt-2">Sedang Diproses</p>
-        </div>
-        <div className="bg-white shadow rounded-lg p-6 text-center">
-          <h2 className="text-2xl font-bold text-green-600">{statusCounts.Selesai}</h2>
-          <p className="text-gray-600 mt-2">Order Selesai</p>
-        </div>
-      </div>
+      {/* Pie Chart */}
+      <PieChartStatus data={statusCounts} />
 
-      {/* Chart */}
+      {/* Chart Bulanan */}
       <OrderChart data={chartData} />
 
       {/* Filter & Export */}
