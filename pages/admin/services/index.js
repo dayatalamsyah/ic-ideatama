@@ -16,13 +16,22 @@ export default function ServicesPage() {
   }, []);
 
   const fetchServices = async () => {
-    const { data, error } = await supabase.from('services').select('*').order('created_at', { ascending: false });
-    if (error) {
-      console.error('Error fetching services:', error);
-    } else {
-      setServices(data);
-    }
-  };
+  const { data, error } = await supabase
+    .from('services')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching services:', error);
+  } else {
+    setServices(data || []); // Pastikan set array walaupun kosong
+  }
+};
+
+// Tambahkan supaya setiap kali halaman aktif, langsung fetch ulang
+useEffect(() => {
+  fetchServices();
+}, []);
 
   const handleDelete = async (id) => {
   if (typeof window !== 'undefined') { // ⛔ Cek kalau client
