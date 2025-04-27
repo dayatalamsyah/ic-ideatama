@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     // Simpan ke database
     const { error: dbError } = await supabase
       .from('orders')
-      .insert([{ name, whatsapp, email, address, service, message }]);
+      .insert([{ name, whatsapp, email, address, service, message, status: "Baru" }]);
 
     if (dbError) {
       console.error('DB Error:', dbError);
