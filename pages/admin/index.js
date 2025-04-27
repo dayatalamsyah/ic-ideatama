@@ -1,7 +1,11 @@
+'use client';
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import supabase from "../../lib/supabaseClient";
 import { isLoggedIn } from "../../lib/auth";
+import * as XLSX from "xlsx";
+import OrderChart from "../../components/OrderChart";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -9,6 +13,7 @@ export default function AdminDashboard() {
   const [totalOrders, setTotalOrders] = useState(0);
   const [totalServices, setTotalServices] = useState(0);
   const [totalProjects, setTotalProjects] = useState(0);
+  const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,19 +26,16 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchDashboard = async () => {
-    // Fetch total orders
     const { count: ordersCount } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true });
     setTotalOrders(ordersCount || 0);
 
-    // Fetch total services
     const { count: servicesCount } = await supabase
       .from('services')
       .select('*', { count: 'exact', head: true });
     setTotalServices(servicesCount || 0);
 
-    // Fetch total projects
     const { count: projectsCount } = await supabase
       .from('projects')
       .select('*', { count: 'exact', head: true });
@@ -51,8 +53,30 @@ export default function AdminDashboard() {
       console.error('Error fetching orders:', error);
     } else {
       setOrders(data || []);
+      generateChartData(data || []);
     }
     setLoading(false);
+  };
+
+  const generateChartData = (orders) => {
+    const bulanMap = {
+      0: "Januari", 1: "Februari", 2: "Maret", 3: "April",
+      4: "Mei", 5: "Juni", 6: "Juli", 7: "Agustus",
+      8: "September", 9: "Oktober", 10: "November", 11: "Desember",
+    };
+    const grouped = {};
+
+    orders.forEach(order => {
+      const month = new Date(order.created_at).getMonth();
+      grouped[month] = (grouped[month] || 0) + 1;
+    });
+
+    const chartArray = Object.keys(bulanMap).map((key) => ({
+      bulan: bulanMap[key],
+      jumlah: grouped[key] || 0,
+    }));
+
+    setChartData(chartArray);
   };
 
   const handleDelete = async (id) => {
@@ -66,6 +90,13 @@ export default function AdminDashboard() {
         alert('Gagal menghapus order');
       }
     }
+  };
+
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(orders);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+    XLSX.writeFile(workbook, "orders-ic-ideatama.xlsx");
   };
 
   return (
@@ -86,6 +117,19 @@ export default function AdminDashboard() {
           <h2 className="text-2xl font-bold text-orange-600">{totalProjects}</h2>
           <p className="text-gray-600 mt-2">Total Proyek</p>
         </div>
+      </div>
+
+      {/* Chart */}
+      <OrderChart data={chartData} />
+
+      {/* Export Excel Button */}
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={exportToExcel}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Export Excel
+        </button>
       </div>
 
       {/* List Order Masuk */}
