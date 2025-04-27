@@ -1,18 +1,46 @@
-export default function GallerySection({ projects }) {
+'use client';
+
+import { useEffect, useState } from "react";
+import supabase from "../lib/supabaseClient";
+
+export default function GallerySection() {
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching projects:', error);
+    } else {
+      setProjects(data || []);
+    }
+  };
+
   return (
-    <section className="bg-white py-16 px-6">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold mb-8 text-center">Galeri Proyek Terbaru</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <div key={project.id} className="bg-gray-100 rounded-xl overflow-hidden shadow hover:shadow-lg transition">
-              <img src={project.image} alt={project.title} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold">{project.title}</h3>
-              </div>
+    <section className="bg-gray-100 py-16 px-6">
+      <h2 className="text-3xl font-bold mb-8 text-center">Galeri Proyek</h2>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {projects.length === 0 ? (
+          <p className="text-center text-gray-500">Belum ada proyek tersedia.</p>
+        ) : (
+          projects.map((project) => (
+            <div key={project.id} className="bg-white p-4 rounded-lg shadow">
+              <img
+                src={project.image_url}
+                alt={project.title}
+                className="w-full h-48 object-cover mb-4 rounded"
+              />
+              <h3 className="text-lg font-semibold text-gray-800 text-center">{project.title}</h3>
             </div>
-          ))}
-        </div>
+          ))
+        )}
       </div>
     </section>
   );
