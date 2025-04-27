@@ -20,7 +20,10 @@ export default function AddServicePage() {
     if (title && description) {
       const { error } = await supabase.from('services').insert([{ title, description }]);
       if (!error) {
-        router.push('/admin/services');
+  setTimeout(() => {
+    router.push('/admin/services');
+  }, 500); // Kasih delay 500ms sebelum redirect
+}
       } else {
         alert('Gagal menambah layanan');
       }
