@@ -92,6 +92,19 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleChangeStatus = async (orderId, newStatus) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: newStatus })
+      .eq('id', orderId);
+
+    if (!error) {
+      fetchOrders();
+    } else {
+      alert('Gagal mengubah status');
+    }
+  };
+
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(orders);
     const workbook = XLSX.utils.book_new();
@@ -149,6 +162,7 @@ export default function AdminDashboard() {
                     <th className="px-4 py-2">Layanan</th>
                     <th className="px-4 py-2">Pesan</th>
                     <th className="px-4 py-2">Tanggal</th>
+                    <th className="px-4 py-2">Status</th>
                     <th className="px-4 py-2">Aksi</th>
                   </tr>
                 </thead>
@@ -162,6 +176,17 @@ export default function AdminDashboard() {
                       <td className="px-4 py-2">{order.service}</td>
                       <td className="px-4 py-2">{order.message}</td>
                       <td className="px-4 py-2">{new Date(order.created_at).toLocaleDateString()}</td>
+                      <td className="px-4 py-2">
+                        <select
+                          value={order.status}
+                          onChange={(e) => handleChangeStatus(order.id, e.target.value)}
+                          className="border rounded px-2 py-1 text-sm"
+                        >
+                          <option value="Baru">Baru</option>
+                          <option value="Diproses">Diproses</option>
+                          <option value="Selesai">Selesai</option>
+                        </select>
+                      </td>
                       <td className="px-4 py-2">
                         <button
                           onClick={() => handleDelete(order.id)}
