@@ -19,6 +19,7 @@ export default function AdminDashboard() {
     Diproses: 0,
     Selesai: 0
   });
+  const [filterStatus, setFilterStatus] = useState('Semua');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -173,8 +174,18 @@ export default function AdminDashboard() {
       {/* Chart */}
       <OrderChart data={chartData} />
 
-      {/* Export Excel Button */}
-      <div className="flex justify-end mb-4">
+      {/* Filter & Export */}
+      <div className="flex justify-between items-center mb-4">
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="border rounded px-4 py-2 text-sm"
+        >
+          <option value="Semua">Semua</option>
+          <option value="Baru">Baru</option>
+          <option value="Diproses">Diproses</option>
+          <option value="Selesai">Selesai</option>
+        </select>
         <button
           onClick={exportToExcel}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
@@ -205,36 +216,41 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order) => (
-                    <tr key={order.id} className="border-t text-center">
-                      <td className="px-4 py-2">{order.name}</td>
-                      <td className="px-4 py-2">{order.whatsapp}</td>
-                      <td className="px-4 py-2">{order.email}</td>
-                      <td className="px-4 py-2">{order.address}</td>
-                      <td className="px-4 py-2">{order.service}</td>
-                      <td className="px-4 py-2">{order.message}</td>
-                      <td className="px-4 py-2">{new Date(order.created_at).toLocaleDateString()}</td>
-                      <td className="px-4 py-2">
-                        <select
-                          value={order.status}
-                          onChange={(e) => handleChangeStatus(order.id, e.target.value)}
-                          className="border rounded px-2 py-1 text-sm"
-                        >
-                          <option value="Baru">Baru</option>
-                          <option value="Diproses">Diproses</option>
-                          <option value="Selesai">Selesai</option>
-                        </select>
-                      </td>
-                      <td className="px-4 py-2">
-                        <button
-                          onClick={() => handleDelete(order.id)}
-                          className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                        >
-                          Hapus
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {orders
+                    .filter((order) => {
+                      if (filterStatus === "Semua") return true;
+                      return order.status === filterStatus;
+                    })
+                    .map((order) => (
+                      <tr key={order.id} className="border-t text-center">
+                        <td className="px-4 py-2">{order.name}</td>
+                        <td className="px-4 py-2">{order.whatsapp}</td>
+                        <td className="px-4 py-2">{order.email}</td>
+                        <td className="px-4 py-2">{order.address}</td>
+                        <td className="px-4 py-2">{order.service}</td>
+                        <td className="px-4 py-2">{order.message}</td>
+                        <td className="px-4 py-2">{new Date(order.created_at).toLocaleDateString()}</td>
+                        <td className="px-4 py-2">
+                          <select
+                            value={order.status}
+                            onChange={(e) => handleChangeStatus(order.id, e.target.value)}
+                            className="border rounded px-2 py-1 text-sm"
+                          >
+                            <option value="Baru">Baru</option>
+                            <option value="Diproses">Diproses</option>
+                            <option value="Selesai">Selesai</option>
+                          </select>
+                        </td>
+                        <td className="px-4 py-2">
+                          <button
+                            onClick={() => handleDelete(order.id)}
+                            className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                          >
+                            Hapus
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             ) : (
