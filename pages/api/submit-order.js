@@ -26,10 +26,10 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Gagal menyimpan data' });
     }
 
-    // Kirim email notifikasi ke Admin
-    const emailResult = await resend.emails.send({
-      from: 'IC-IDEATAMA <onboarding@resend.dev>', // Kirim pakai resend.dev dulu
-      to: 'hello@ic-ideatama.com', // Ganti ke email admin Bro Dayat
+    // Kirim Email ke Admin
+    await resend.emails.send({
+      from: 'IC-IDEATAMA <onboarding@resend.dev>',
+      to: 'hello@ic-ideatama.com', // Ganti ke email Admin Bro Dayat
       subject: 'Order Baru Masuk dari Website',
       html: `
         <div style="font-family: sans-serif; padding: 20px;">
@@ -46,9 +46,30 @@ export default async function handler(req, res) {
       `,
     });
 
-    console.log('Email sent result:', emailResult);
+    // Kirim Auto Reply ke Customer
+    await resend.emails.send({
+      from: 'IC-IDEATAMA <onboarding@resend.dev>',
+      to: email, // Ke email Customer
+      subject: 'Terima Kasih Telah Menghubungi IC-IDEATAMA',
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2>Halo ${name},</h2>
+          <p>Terima kasih telah menghubungi <strong>PT. IC-IDEATAMA</strong>.</p>
+          <p>Tim kami akan segera menghubungi Anda untuk menindaklanjuti permintaan layanan berikut:</p>
+          <ul>
+            <li><strong>Layanan:</strong> ${service}</li>
+            <li><strong>Alamat:</strong> ${address}</li>
+            <li><strong>Pesan Tambahan:</strong> ${message || '-'}</li>
+          </ul>
+          <p>Jika ada pertanyaan mendesak, silakan hubungi kami melalui WhatsApp: <strong>${whatsapp}</strong></p>
+          <br/>
+          <p>Salam hangat,</p>
+          <p><strong>PT. IC-IDEATAMA</strong></p>
+        </div>
+      `,
+    });
 
-    return res.status(200).json({ message: 'Order berhasil disimpan dan email dikirim.' });
+    return res.status(200).json({ message: 'Order berhasil diproses dan email dikirim.' });
 
   } catch (error) {
     console.error('Submit Order Error:', error);
