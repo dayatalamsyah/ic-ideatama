@@ -25,13 +25,17 @@ export default function ServicesPage() {
   };
 
   const handleDelete = async (id) => {
+  if (typeof window !== 'undefined') { // ⛔ Cek kalau client
     if (confirm('Yakin mau hapus layanan ini?')) {
       const { error } = await supabase.from('services').delete().eq('id', id);
       if (!error) {
         fetchServices(); // Refresh daftar setelah hapus
+      } else {
+        alert('Gagal menghapus layanan');
       }
     }
-  };
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
