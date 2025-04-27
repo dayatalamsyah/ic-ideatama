@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { loginAdmin } from "../../lib/auth";
+import { toast } from "react-hot-toast";
 
 export default function AdminLogin() {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
-  const [error, setError] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (username === 'admin' && password === 'ideatama123') {
       loginAdmin(remember);
+      toast.success('Login berhasil!');
       router.push('/admin');
     } else {
-      setError('Username atau Password salah');
+      toast.error('Username atau Password salah');
     }
   };
 
@@ -23,7 +24,6 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form onSubmit={handleLogin} className="bg-white p-8 rounded-lg shadow-md w-96">
         <h1 className="text-2xl font-bold mb-6 text-center">Login Admin</h1>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
         <input
           type="text"
           placeholder="Username"
@@ -41,7 +41,6 @@ export default function AdminLogin() {
           required
         />
 
-        {/* Checkbox Remember Me */}
         <div className="flex items-center mb-6">
           <input
             type="checkbox"
