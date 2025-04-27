@@ -14,6 +14,11 @@ export default function AdminDashboard() {
   const [totalServices, setTotalServices] = useState(0);
   const [totalProjects, setTotalProjects] = useState(0);
   const [chartData, setChartData] = useState([]);
+  const [statusCounts, setStatusCounts] = useState({
+    Baru: 0,
+    Diproses: 0,
+    Selesai: 0
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -54,6 +59,7 @@ export default function AdminDashboard() {
     } else {
       setOrders(data || []);
       generateChartData(data || []);
+      generateStatusCounts(data || []);
     }
     setLoading(false);
   };
@@ -77,6 +83,22 @@ export default function AdminDashboard() {
     }));
 
     setChartData(chartArray);
+  };
+
+  const generateStatusCounts = (orders) => {
+    const countStatus = {
+      Baru: 0,
+      Diproses: 0,
+      Selesai: 0
+    };
+
+    orders.forEach(order => {
+      if (order.status === "Baru") countStatus.Baru++;
+      if (order.status === "Diproses") countStatus.Diproses++;
+      if (order.status === "Selesai") countStatus.Selesai++;
+    });
+
+    setStatusCounts(countStatus);
   };
 
   const handleDelete = async (id) => {
@@ -117,7 +139,7 @@ export default function AdminDashboard() {
       <h1 className="text-3xl font-bold mb-8">Dashboard Admin - Order Masuk</h1>
 
       {/* Statistik Dashboard */}
-      <div className="grid md:grid-cols-3 gap-6 mb-12">
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white shadow rounded-lg p-6 text-center">
           <h2 className="text-2xl font-bold text-orange-600">{totalOrders}</h2>
           <p className="text-gray-600 mt-2">Total Order</p>
@@ -129,6 +151,22 @@ export default function AdminDashboard() {
         <div className="bg-white shadow rounded-lg p-6 text-center">
           <h2 className="text-2xl font-bold text-orange-600">{totalProjects}</h2>
           <p className="text-gray-600 mt-2">Total Proyek</p>
+        </div>
+      </div>
+
+      {/* Statistik per Status */}
+      <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="bg-white shadow rounded-lg p-6 text-center">
+          <h2 className="text-2xl font-bold text-blue-600">{statusCounts.Baru}</h2>
+          <p className="text-gray-600 mt-2">Order Baru</p>
+        </div>
+        <div className="bg-white shadow rounded-lg p-6 text-center">
+          <h2 className="text-2xl font-bold text-yellow-600">{statusCounts.Diproses}</h2>
+          <p className="text-gray-600 mt-2">Sedang Diproses</p>
+        </div>
+        <div className="bg-white shadow rounded-lg p-6 text-center">
+          <h2 className="text-2xl font-bold text-green-600">{statusCounts.Selesai}</h2>
+          <p className="text-gray-600 mt-2">Order Selesai</p>
         </div>
       </div>
 
