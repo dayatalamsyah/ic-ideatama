@@ -34,17 +34,20 @@ useEffect(() => {
 }, []);
 
   const handleDelete = async (id) => {
-  if (typeof window !== 'undefined') { // ⛔ Cek kalau client
-    if (confirm('Yakin mau hapus layanan ini?')) {
-      const { error } = await supabase.from('services').delete().eq('id', id);
-      if (!error) {
-        fetchServices(); // Refresh daftar setelah hapus
-      } else {
-        alert('Gagal menghapus layanan');
-      }
+  if (confirm('Yakin mau hapus layanan ini?')) {
+    const { error } = await supabase.from('services').delete().eq('id', id);
+    if (!error) {
+      console.log('Layanan berhasil dihapus.');
+      setTimeout(() => {
+        fetchServices(); // kasih delay sebelum refresh
+      }, 500);
+    } else {
+      console.error('Gagal menghapus layanan:', error);
+      alert('Gagal menghapus layanan');
     }
   }
 };
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
