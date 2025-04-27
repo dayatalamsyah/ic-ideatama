@@ -10,18 +10,22 @@ export default function EditServicePage() {
   const [description, setDescription] = useState('');
 
   useEffect(() => {
+    if (!router.isReady) return; // ⛔ TUNGGU router ready
+
     if (!isLoggedIn()) {
       router.push('/admin/login');
     } else if (id) {
       fetchService();
     }
-  }, [id]);
+  }, [router.isReady, id]);
 
   const fetchService = async () => {
     const { data, error } = await supabase.from('services').select('*').eq('id', id).single();
     if (data) {
       setTitle(data.title);
       setDescription(data.description);
+    } else {
+      console.error('Gagal fetch data:', error);
     }
   };
 
