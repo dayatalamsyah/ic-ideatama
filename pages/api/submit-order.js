@@ -5,7 +5,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-async function sendEmail({ to, subject, html }) {
+async function sendEmail({ subject, html }) {
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -14,7 +14,7 @@ async function sendEmail({ to, subject, html }) {
     },
     body: JSON.stringify({
       from: 'IC-IDEATAMA <onboarding@resend.dev>',
-      to: [to],
+      to: ['dayatalamsyah@gmail.com'], // sementara ke emailmu
       subject,
       html,
     })
@@ -43,9 +43,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Gagal menyimpan data.' });
     }
 
-    // Kirim email ke admin
+    // Kirim email notifikasi admin
     await sendEmail({
-      to: 'hello@ic-ideatama.com',
       subject: 'Order Baru Masuk dari Website',
       html: `
         <h2>Order Baru 🚀</h2>
@@ -58,16 +57,13 @@ export default async function handler(req, res) {
       `
     });
 
-    // Auto-reply ke customer
+    // Kirim auto-reply ke customer (sementara ke kamu juga)
     await sendEmail({
-      to: email,
       subject: 'Terima Kasih Telah Menghubungi IC-IDEATAMA',
       html: `
         <h2>Halo ${name},</h2>
         <p>Terima kasih telah menghubungi PT. IC-IDEATAMA.</p>
-        <p>Kami akan segera menghubungi Anda terkait layanan: <strong>${service}</strong>.</p>
-        <p>Salam hangat,</p>
-        <p><strong>PT. IC-IDEATAMA</strong></p>
+        <p>Data Anda sudah kami terima dan akan segera diproses.</p>
       `
     });
 
