@@ -5,7 +5,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-async function sendEmail({ to, subject, html }) {
+async function sendEmail({ subject, html }) {
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -14,7 +14,7 @@ async function sendEmail({ to, subject, html }) {
     },
     body: JSON.stringify({
       from: 'IC-IDEATAMA <onboarding@resend.dev>',
-      to: [to],
+      to: ['dayatalamsyah@gmail.com'], // sementara ke emailmu
       subject,
       html,
     })
@@ -55,7 +55,6 @@ export default async function handler(req, res) {
     }
 
     await sendEmail({
-      to: orderData.email,
       subject: 'Update Status Order Anda di IC-IDEATAMA',
       html: `
         <h2>Halo ${orderData.name},</h2>
