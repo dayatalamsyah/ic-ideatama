@@ -7,11 +7,8 @@ export default function HeroSection() {
       <img
         src="/images/LOGO ICI WHITE - Vektor.png"
         alt="Logo PT. INTI CAHAYA IDEATAMA"
-        className="mx-auto mb-4 w-28"
+        className="mx-auto mb-6 w-40 sm:w-48 md:w-56"
       />
-
-      {/* Judul utama */}
-      <h1 className="text-3xl font-bold mb-4">PT. INTI CAHAYA IDEATAMA</h1>
 
       {/* Slogan */}
       <p className="text-lg mb-6">
