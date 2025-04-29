@@ -8,7 +8,7 @@ export default function HeroSection() {
     <section className="bg-orange-600 text-white py-16 px-6 text-center relative">
       <div className="max-w-5xl mx-auto flex flex-col items-center justify-center">
         <Image
-          src="/images/LOGO ICI - Vektor-icon.png"
+          src="/public/images/LOGO ICI - Vektor-icon.png"
           alt="Logo PT. INTI CAHAYA IDEATAMA"
           width={100}
           height={100}
